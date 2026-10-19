@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type CheckStatus = "pass" | "fail" | "warn";
@@ -133,10 +134,10 @@ export default function Home() {
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href="/" aria-label="Secure App Lab home">
+        <Link className="brand" href="/" aria-label="Secure App Lab home">
           <span className="brand-mark">S<span>.</span></span>
           <span>SECURE<span className="brand-muted"> / LAB</span></span>
-        </a>
+        </Link>
         <div className="workspace-label">WORKSPACE <span>LOCAL INSTANCE</span></div>
         <nav className="side-nav" aria-label="Main navigation">
           {navItems.map((item) => (
