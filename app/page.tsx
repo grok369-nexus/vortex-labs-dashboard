@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+const LearningLab = dynamic(() => import("./components/LearningLab"), {
+  loading: () => <div className="learning-grid" role="status" aria-live="polite"><div className="learning-loading-card"><span className="loading-shimmer" /><span className="loading-shimmer short" /><span className="loading-shimmer" /></div><div className="learning-loading-card"><span className="loading-shimmer" /><span className="loading-shimmer short" /><span className="loading-shimmer" /></div></div>
+});
 
 type CheckStatus = "pass" | "fail" | "warn";
 type Check = { id: string; title: string; category: string; status: CheckStatus; detail: string; fix: string };
@@ -190,12 +195,7 @@ export default function Home() {
 
           {active === "findings" && <div className="results-panel full-panel"><div className="panel-heading"><div><span className="panel-indicator" /> OPEN FINDINGS</div><span>{findings.length} ITEMS</span></div>{findings.length === 0 && checks.length > 0 ? <div className="empty-state">No failed checks or warnings in this run. Keep testing beyond headers.</div> : findings.length === 0 ? <div className="empty-state">Run checks to identify findings.</div> : findings.map((check) => <div className="finding-row" key={check.id}><div className={`status-symbol ${check.status}`}>{check.status === "fail" ? "!" : "△"}</div><div className="finding-body"><div className="finding-meta">{check.category} <span>·</span> {check.status === "fail" ? "Needs remediation" : "Review recommended"}</div><h3>{check.title}</h3><p>{check.detail}</p><div className="fix-note"><strong>Suggested fix</strong><span>{check.fix}</span></div></div></div>)}</div>}
 
-          {active === "learn" && <div className="learning-grid">
-            <article className="learning-card"><span className="learning-number">01</span><div className="section-kicker">BROWSER DEFENSE</div><h2>Security headers</h2><p>Headers tell browsers how to handle content: CSP limits allowed resources, frame restrictions reduce clickjacking, and nosniff prevents MIME-type guessing.</p><div className="learning-tag">CHECKED IN THIS BUILD</div></article>
-            <article className="learning-card"><span className="learning-number">02</span><div className="section-kicker">IDENTITY & ACCESS</div><h2>Server-side authorization</h2><p>Hiding a button is not access control. Every protected server operation must verify who is calling and whether that identity can perform the action.</p><div className="learning-tag planned">NEXT PHASE</div></article>
-            <article className="learning-card"><span className="learning-number">03</span><div className="section-kicker">INPUT & DATA</div><h2>Validate at boundaries</h2><p>Treat incoming data as untrusted. Validate type, shape, length and allowed values on the server, and use parameterized database queries.</p><div className="learning-tag planned">NEXT PHASE</div></article>
-            <article className="learning-card"><span className="learning-number">04</span><div className="section-kicker">PROVE THE FIX</div><h2>Retest automatically</h2><p>A finding is not closed because code changed. Add a repeatable test, run it after the fix, and keep the evidence with the change.</p><div className="learning-tag planned">NEXT PHASE</div></article>
-          </div>}
+          {active === "learn" && <LearningLab />}
 
           <footer className="app-footer"><span>SECURE APP LAB <span className="footer-divider">/</span> CORE SECURITY DASHBOARD</span><span>BUILD CAREFULLY. TEST RESPONSIBLY.</span></footer>
         </div>
