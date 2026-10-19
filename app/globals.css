@@ -39,7 +39,7 @@ h1 span { color: #929fb6; }
 .hero-foot strong { font: 11px 'DM Mono', monospace; letter-spacing: .06em; }
 .stage { display: flex; align-items: center; gap: 9px; }
 .section { padding: 88px 0 75px; }
-.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 30px; }
+.section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 30px; }
 .section-kicker { color: var(--violet); margin-bottom: 15px; }
 h2 { margin: 0; font-size: clamp(27px, 4vw, 38px); letter-spacing: -.05em; line-height: 1.2; }
 .section-heading > p { max-width: 290px; margin: 0 0 3px; color: var(--muted); font-size: 12px; line-height: 1.8; }
@@ -66,7 +66,7 @@ h2 { margin: 0; font-size: clamp(27px, 4vw, 38px); letter-spacing: -.05em; line-
   .hero { padding-top: 75px; }
   .pillar-grid { grid-template-columns: repeat(2, 1fr); }
   .principles-section { grid-template-columns: 1fr; gap: 28px; }
-  .section-heading { align-items: start; flex-direction: column; gap: 14px; }
+  .section-heading { align-items: flex-start; flex-direction: column; gap: 14px; }
 }
 @media (max-width: 520px) {
   .shell { width: calc(100% - 32px); }
