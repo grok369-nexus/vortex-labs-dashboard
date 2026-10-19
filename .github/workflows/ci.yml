@@ -27,3 +27,55 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Test production security headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 127.0.0.1 > /tmp/secure-app-lab.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          headers_file=/tmp/secure-app-lab-headers.txt
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --dump-header "$headers_file" --output /dev/null http://127.0.0.1:3000/; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/secure-app-lab.log
+            echo "Production server did not become ready."
+            exit 1
+          fi
+          require_header() {
+            if ! grep --ignore-case --extended-regexp --quiet "^$1:[[:space:]]*$2[[:space:]]*\\r?$" "$headers_file"; then
+              echo "Missing or incorrect response header: $1: $2"
+              cat "$headers_file"
+              exit 1
+            fi
+            echo "PASS: $1"
+          }
+          require_header "X-Content-Type-Options" "nosniff"
+          require_header "X-Frame-Options" "DENY"
+          require_header "Referrer-Policy" "strict-origin-when-cross-origin"
+          require_header "Permissions-Policy" "camera=\\(\\), microphone=\\(\\), geolocation=\\(\\)"
+          if ! grep --ignore-case --quiet "^Content-Security-Policy:" "$headers_file"; then
+            echo "Missing Content-Security-Policy response header."
+            cat "$headers_file"
+            exit 1
+          fi
+          csp_line=$(grep --ignore-case "^Content-Security-Policy:" "$headers_file" | head -n 1)
+          for directive in "default-src 'self'" "object-src 'none'" "base-uri 'self'" "frame-ancestors 'none'"; do
+            if [[ "$csp_line" != *"$directive"* ]]; then
+              echo "CSP is missing required directive: $directive"
+              echo "$csp_line"
+              exit 1
+            fi
+            echo "PASS: CSP $directive"
+          done
+          if grep --ignore-case --quiet "^X-Powered-By:" "$headers_file"; then
+            echo "Unexpected X-Powered-By header is present."
+            exit 1
+          fi
+          echo "PASS: X-Powered-By is not exposed"
