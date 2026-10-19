@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const pillars = [
   { number: "01", title: "Identity & sessions", text: "Authentication, session lifecycle, and safe recovery flows.", status: "Planned" },
   { number: "02", title: "Access control", text: "Server-side authorization on every protected operation.", status: "Planned" },
@@ -17,10 +19,10 @@ export default function Home() {
   return (
     <main className="shell">
       <nav className="nav">
-        <a className="brand" href="/" aria-label="Secure App Lab home">
+        <Link className="brand" href="/" aria-label="Secure App Lab home">
           <span className="brand-mark">S<span>.</span></span>
           <span>SECURE<span className="brand-muted"> / LAB</span></span>
-        </a>
+        </Link>
         <span className="nav-label"><span className="pulse" /> SECURITY-FIRST BUILD</span>
       </nav>
 
@@ -70,7 +72,7 @@ export default function Home() {
       </section>
 
       <footer className="footer">
-        <a className="brand footer-brand" href="/"><span className="brand-mark">S<span>.</span></span><span>SECURE<span className="brand-muted"> / LAB</span></span></a>
+        <Link className="brand footer-brand" href="/" aria-label="Secure App Lab home"><span className="brand-mark">S<span>.</span></span><span>SECURE<span className="brand-muted"> / LAB</span></span></Link>
         <span>Build carefully. Test responsibly.</span>
         <span className="footer-note">NO SECURITY CLAIMS WITHOUT EVIDENCE</span>
       </footer>
