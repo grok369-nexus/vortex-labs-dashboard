@@ -25,6 +25,8 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Unit test server-side input validation
+        run: node --test lib/contact-validation.test.mjs
       - name: Build
         run: npm run build
       - name: Test production security headers
@@ -79,3 +81,28 @@ jobs:
             exit 1
           fi
           echo "PASS: X-Powered-By is not exposed"
+
+          require_status() {
+            actual="$1"
+            expected="$2"
+            name="$3"
+            if [ "$actual" != "$expected" ]; then
+              echo "FAIL: $name expected HTTP $expected, received HTTP $actual"
+              cat /tmp/secure-app-lab-api-response.json
+              exit 1
+            fi
+            echo "PASS: $name (HTTP $actual)"
+          }
+          valid_payload='{"name":"Ada Lovelace","email":"ada@example.com","message":"Please send me more information."}'
+          status=$(curl --silent --output /tmp/secure-app-lab-api-response.json --write-out '%{http_code}' --request POST --header 'Content-Type: application/json' --data "$valid_payload" http://127.0.0.1:3000/api/security/input-check)
+          require_status "$status" "200" "Valid input is accepted"
+          grep --quiet '"persisted":false' /tmp/secure-app-lab-api-response.json
+          status=$(curl --silent --output /tmp/secure-app-lab-api-response.json --write-out '%{http_code}' --request POST --header 'Content-Type: application/json' --data '{"name":"Ada Lovelace","message":"Please send me more information."}' http://127.0.0.1:3000/api/security/input-check)
+          require_status "$status" "422" "Missing email is rejected"
+          status=$(curl --silent --output /tmp/secure-app-lab-api-response.json --write-out '%{http_code}' --request POST --header 'Content-Type: text/plain' --data "$valid_payload" http://127.0.0.1:3000/api/security/input-check)
+          require_status "$status" "415" "Unsupported content type is rejected"
+          status=$(curl --silent --output /tmp/secure-app-lab-api-response.json --write-out '%{http_code}' --request POST --header 'Content-Type: application/json' --data '{' http://127.0.0.1:3000/api/security/input-check)
+          require_status "$status" "400" "Malformed JSON is rejected"
+          large_payload=$(node -e 'process.stdout.write(JSON.stringify({name:"Ada Lovelace",email:"ada@example.com",message:"x".repeat(5000)}))')
+          status=$(curl --silent --output /tmp/secure-app-lab-api-response.json --write-out '%{http_code}' --request POST --header 'Content-Type: application/json' --data "$large_payload" http://127.0.0.1:3000/api/security/input-check)
+          require_status "$status" "413" "Oversized request body is rejected"
