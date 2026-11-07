@@ -4,7 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const LearningLab = dynamic(() => import("./components/LearningLab"), {
+const InputValidationLab = dynamic(() => import("./components/InputValidationLab"), {\n  loading: () => <div className="learning-loading-card" role="status" aria-live="polite"><span className="loading-shimmer" /><span className="loading-shimmer short" /><span className="loading-shimmer" /></div>\n});\n\nconst LearningLab = dynamic(() => import("./components/LearningLab"), {
   loading: () => <div className="learning-grid" role="status" aria-live="polite"><div className="learning-loading-card"><span className="loading-shimmer" /><span className="loading-shimmer short" /><span className="loading-shimmer" /></div><div className="learning-loading-card"><span className="loading-shimmer" /><span className="loading-shimmer short" /><span className="loading-shimmer" /></div></div>
 });
 
@@ -14,7 +14,7 @@ type ScanState = "idle" | "running" | "complete" | "error";
 
 const navItems = [
   { id: "overview", label: "Overview", icon: "◫" },
-  { id: "checks", label: "Security checks", icon: "⌁" },
+  { id: "checks", label: "Security checks", icon: "⌁" },\n  { id: "input", label: "Input validation", icon: "⛨" },
   { id: "findings", label: "Findings", icon: "⚑" },
   { id: "learn", label: "Learning lab", icon: "⌘" }
 ];
@@ -167,8 +167,8 @@ export default function Home() {
         <div className="content">
           <div className="page-heading">
             <div><div className="eyebrow"><span className="eyebrow-line" /> SECURITY ENGINEERING WORKSPACE</div>
-              <h1>{active === "overview" ? <>Your security.<br /><span>Measured, not assumed.</span></> : active === "checks" ? <>Response checks.<br /><span>Inspect the evidence.</span></> : active === "findings" ? <>Every gap is a task.<br /><span>Fix, then verify.</span></> : <>Learn the control.<br /><span>Understand the why.</span></>}</h1>
-              <p className="page-description">A live, same-origin inspection of Secure App Lab’s HTTP response protections. No external targets are contacted.</p>
+              <h1>{active === "overview" ? <>Your security.<br /><span>Measured, not assumed.</span></> : active === "checks" ? <>Response checks.<br /><span>Inspect the evidence.</span></> : active === "input" ? <>Trust nothing.<br /><span>Validate at the boundary.</span></> : active === "findings" ? <>Every gap is a task.<br /><span>Fix, then verify.</span></> : <>Learn the control.<br /><span>Understand the why.</span></>}</h1>
+              <p className="page-description">A focused security workspace for testing this application’s own response protections and server-side input boundaries.</p>
             </div>
             <button className="run-button" onClick={() => void runScan()} disabled={scanState === "running"}><span>↻</span>{scanState === "running" ? "Running checks…" : "Run checks"}</button>
           </div>
@@ -191,7 +191,7 @@ export default function Home() {
             <div className="note-strip"><span className="note-icon">i</span><p><strong>Scope note</strong> This is a focused baseline, not a penetration test or security certification. It checks visible response behavior only; it cannot prove authentication, authorization, or data-layer security.</p></div>
           </>}
 
-          {active === "checks" && <div className="results-panel full-panel"><div className="panel-heading"><div><span className="panel-indicator" /> ALL RESPONSE CHECKS</div><span>{checks.length} CHECKS</span></div>{checks.length === 0 ? <div className="empty-state">Run checks to collect evidence.</div> : checks.map((check) => <CheckRow key={check.id} check={check} />)}</div>}
+          {active === "input" && <InputValidationLab />}\n\n          {active === "checks" && <div className="results-panel full-panel"><div className="panel-heading"><div><span className="panel-indicator" /> ALL RESPONSE CHECKS</div><span>{checks.length} CHECKS</span></div>{checks.length === 0 ? <div className="empty-state">Run checks to collect evidence.</div> : checks.map((check) => <CheckRow key={check.id} check={check} />)}</div>}
 
           {active === "findings" && <div className="results-panel full-panel"><div className="panel-heading"><div><span className="panel-indicator" /> OPEN FINDINGS</div><span>{findings.length} ITEMS</span></div>{findings.length === 0 && checks.length > 0 ? <div className="empty-state">No failed checks or warnings in this run. Keep testing beyond headers.</div> : findings.length === 0 ? <div className="empty-state">Run checks to identify findings.</div> : findings.map((check) => <div className="finding-row" key={check.id}><div className={`status-symbol ${check.status}`}>{check.status === "fail" ? "!" : "△"}</div><div className="finding-body"><div className="finding-meta">{check.category} <span>·</span> {check.status === "fail" ? "Needs remediation" : "Review recommended"}</div><h3>{check.title}</h3><p>{check.detail}</p><div className="fix-note"><strong>Suggested fix</strong><span>{check.fix}</span></div></div></div>)}</div>}
 
