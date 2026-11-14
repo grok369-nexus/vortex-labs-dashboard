@@ -8,6 +8,15 @@ updates:
     labels:
       - dependencies
       - security
+    groups:
+      react-runtime:
+        patterns:
+          - "react"
+          - "react-dom"
+      next-framework:
+        patterns:
+          - "next"
+          - "eslint-config-next"
   - package-ecosystem: github-actions
     directory: /
     schedule:
